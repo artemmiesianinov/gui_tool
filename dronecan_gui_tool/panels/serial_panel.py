@@ -43,6 +43,17 @@ class UBloxError(Exception):
         Exception.__init__(self, msg)
         self.message = msg
 
+class UBloxAttrDict(dict):
+    '''allow dictionary members as attributes'''
+    def __getattr__(self, name):
+        try:
+            return self.__getitem__(name)
+        except KeyError:
+            raise AttributeError(name)
+
+    def __setattr__(self, name, value):
+        self.__setitem__(name, value)
+
 class UBloxDescriptor:
     '''class used to describe the layout of a UBlox message'''
     def __init__(self, name, msg_format, fields=[], count_field=None, format2=None, fields2=None):
@@ -96,7 +107,7 @@ class UBloxDescriptor:
                 break
 
         if self.count_field == '_remaining':
-            count = len(buf) / struct.calcsize(self.format2)
+            count = len(buf) // struct.calcsize(self.format2)
 
         if count == 0:
             msg._unpacked = True
