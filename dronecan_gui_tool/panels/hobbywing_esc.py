@@ -141,7 +141,9 @@ class HobbywingPanel(QDialog):
             
     def handle_GetMajorConfig_reply(self, msg):
         '''handle a reply to a GetMajorConfig'''
-        nodeid = msg.transfer.source_node_id
+        if msg is None:
+            # request timed out, e.g. the ESC is busy or offline; the next poll will retry
+            return
         if msg.response.throttle_source == 0:
             txt = "CAN"
         else:
