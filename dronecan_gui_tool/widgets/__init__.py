@@ -120,6 +120,8 @@ class BasicTable(QTableWidget):
             w = QTableWidgetItem(str(value))
             if color is not None:
                 w.setBackground(color)
+                # The palette text color may be light (dark themes), so pick one that contrasts with the background
+                w.setForeground(QColor(Qt.black) if color.lightness() > 127 else QColor(Qt.white))
             w.setTextAlignment(Qt.AlignVCenter | Qt.AlignLeft)
             w.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.setItem(row, col, w)
