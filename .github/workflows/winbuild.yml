@@ -10,6 +10,8 @@ on:
   pull_request:
     branches:
       - '*'
+  # Allows starting a build by hand from the Actions tab
+  workflow_dispatch:
 
 jobs:
 
@@ -24,20 +26,21 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
 
 
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v5
+      id: python
       with:
-        python-version: '3.10'
+        python-version: '3.14'
 
 
-    # Build the Windows Application Packaging project
+    # Build the MSI in a fresh venv, the same way as a local Windows build
     - name: Build a Windows App
-      shell: cmd
-      run: .\winbuild.bat
+      shell: pwsh
+      run: .\winbuild_env.ps1 -BasePython "${{ steps.python.outputs.python-path }}"
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-artifact
     - name: Upload build artifacts

@@ -112,7 +112,8 @@ if 'install' in sys.argv and (sys.platform.startswith('linux') or sys.platform.s
 # Windows-specific options and hacks
 #
 if os.name == 'nt':
-    args.setdefault('install_requires', []).append('cx_Freeze ~= 6.1')
+    # cx_Freeze 8 supports Python 3.10 to 3.15; on 3.13+ it builds MSIs with python-msilib, as msilib left the stdlib
+    args.setdefault('install_requires', []).append('cx_Freeze >= 8.7')
 
 if ('bdist_msi' in sys.argv) or ('build_exe' in sys.argv):
     import cx_Freeze
@@ -151,7 +152,9 @@ if ('bdist_msi' in sys.argv) or ('build_exe' in sys.argv):
     import numpy
 
     # Oh, Windows, never change.
-    missing_dlls = glob.glob(os.path.join(os.path.dirname(numpy.core.__file__), '*.dll'))
+    # numpy 2 moved numpy.core to numpy._core
+    numpy_core_dir = os.path.join(os.path.dirname(numpy.__file__), '_core' if hasattr(numpy, '_core') else 'core')
+    missing_dlls = glob.glob(os.path.join(numpy_core_dir, '*.dll'))
     print('Missing DLL:', missing_dlls)
 
     # My reverence for you, I hope, will help control my inborn instability; we are accustomed to a zigzag way of life.
@@ -186,7 +189,7 @@ if ('bdist_msi' in sys.argv) or ('build_exe' in sys.argv):
     }
     args['executables'] = [
         cx_Freeze.Executable(os.path.join('bin', PACKAGE_NAME),
-                             base='Win32GUI',
+                             base='gui',
                              icon='icons/logo.ico',
                              shortcut_name=HUMAN_FRIENDLY_NAME,
                              shortcut_dir='ProgramMenuFolder'),

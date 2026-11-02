@@ -6,19 +6,21 @@
 #   powershell -ExecutionPolicy Bypass -File .\winbuild_env.ps1             # set up the environment and build the MSI
 #   powershell -ExecutionPolicy Bypass -File .\winbuild_env.ps1 -SetupOnly  # only set up the environment
 #   powershell -ExecutionPolicy Bypass -File .\winbuild_env.ps1 -Clean      # recreate the environment from scratch
+#   powershell -ExecutionPolicy Bypass -File .\winbuild_env.ps1 -BasePython C:\Python310\python.exe
+#                                                     # use this interpreter instead of finding or installing one (CI)
 #
 # The MSI is written to the 'dist' folder.
-# Python 3.10 matches the CI build (.github/workflows/winbuild.yml); setup.py requires cx_Freeze 6.x on Windows,
-# which does not support recent Python versions.
+# Python 3.14 matches the CI build (.github/workflows/winbuild.yml). Keep the two in step.
 
 param(
     [switch]$SetupOnly,
-    [switch]$Clean
+    [switch]$Clean,
+    [string]$BasePython
 )
 
 $ErrorActionPreference = 'Stop'
 
-$PythonVersion = '3.10'
+$PythonVersion = '3.14'
 $VenvDir = Join-Path $PSScriptRoot '.venv-win'
 $Python = Join-Path $VenvDir 'Scripts\python.exe'
 
@@ -44,7 +46,9 @@ function Test-PythonInstalled {
 Set-Location $PSScriptRoot
 
 # Python
-if (-not (Test-PythonInstalled)) {
+if ($BasePython) {
+    Invoke-Checked $BasePython @('--version')
+} elseif (-not (Test-PythonInstalled)) {
     Write-Host "Python $PythonVersion not found, installing it with winget" -ForegroundColor Yellow
     Invoke-Checked 'winget' @('install', '--id', "Python.Python.$PythonVersion", '-e',
                               '--accept-package-agreements', '--accept-source-agreements')
@@ -62,7 +66,11 @@ if ($Clean -and (Test-Path $VenvDir)) {
     Remove-Item -Recurse -Force $VenvDir
 }
 if (-not (Test-Path $Python)) {
-    Invoke-Checked 'py' @("-$PythonVersion", '-m', 'venv', $VenvDir)
+    if ($BasePython) {
+        Invoke-Checked $BasePython @('-m', 'venv', $VenvDir)
+    } else {
+        Invoke-Checked 'py' @("-$PythonVersion", '-m', 'venv', $VenvDir)
+    }
 }
 
 # Dependencies, same set as winbuild.bat. Installing the project also pulls in cx_Freeze (see setup.py).
