@@ -48,7 +48,8 @@ class TableDisplay(QTableWidget):
     def get_selected(self):
         '''get the selected row key'''
         row = self.currentRow()
-        if row is None:
+        # currentRow() is -1 when nothing is selected, which would otherwise pick the last row
+        if row is None or row < 0 or row >= len(self.row_keys):
             return None
         return self.row_keys[row]
 

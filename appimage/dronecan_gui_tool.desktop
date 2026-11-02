@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=DroneCAN GUI Tool
+GenericName=DroneCAN Bus Management and Diagnostics App
+Comment=DroneCAN Bus Management and Diagnostics App
+Exec=dronecan_gui_tool %U
+Icon=dronecan_gui_tool
+Terminal=false
+Categories=Development;Utility;

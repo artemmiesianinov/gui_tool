@@ -64,7 +64,9 @@ args = dict(
             '{0}={0}.main:main'.format(PACKAGE_NAME),
         ]
     },
-    include_package_data=True,
+    # Package data is listed explicitly in package_data below. Picking it up from git (setuptools_git) makes setuptools
+    # warn that the 'icons' directory looks like a package that is missing from 'packages'.
+    include_package_data=False,
 
     # Meta fields, they have no technical meaning
     description='DroneCAN Bus Management and Diagnostics App',
@@ -86,7 +88,7 @@ args = dict(
         'Environment :: Win32 (MS Windows)',
         'Environment :: MacOS X',
     ],
-    package_data={'DroneCAN_GUI_Tool': [ 'icons/*.png', 'icons/*.ico']}
+    package_data={PACKAGE_NAME: ['icons/*.png', 'icons/*.ico']}
 )
 
 if 'install' in sys.argv and (sys.platform.startswith('linux') or sys.platform.startswith('darwin')):

@@ -65,3 +65,4 @@ target/
 .idea/
 
 venv/
+.venv-win/
