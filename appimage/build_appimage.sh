@@ -9,19 +9,19 @@
 #   appimage/build_appimage.sh
 #
 # Environment variables:
-#   PYTHON_VERSION   Python version to bundle (default 3.12)
+#   PYTHON_VERSION   Python version to bundle (default 3.14)
 #   LINUX_TAG        manylinux tag of the base Python image (default manylinux_2_28_x86_64)
 #
-# The result is written to dist/DroneCAN_GUI_Tool-<version>-x86_64.AppImage.
+# The result is written to build/DroneCAN_GUI_Tool-<version>-x86_64.AppImage.
 
 set -euo pipefail
 
-PYTHON_VERSION="${PYTHON_VERSION:-3.12}"
+PYTHON_VERSION="${PYTHON_VERSION:-3.14}"
 LINUX_TAG="${LINUX_TAG:-manylinux_2_28_x86_64}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_DIR="$(dirname "$SCRIPT_DIR")"
-DIST_DIR="$SOURCE_DIR/dist"
+DIST_DIR="$SOURCE_DIR/build"
 WORK_DIR="$(mktemp -d)"
 trap 'rm -rf "$WORK_DIR"' EXIT
 
